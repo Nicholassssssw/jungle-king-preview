@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="A design preview of the animal story revealed after a Jungle King scan.">
+  <title>Animal story · Jungle King</title>
+  <link rel="stylesheet" href="result-preview.css">
+  <script type="module" src="result-preview.js"></script>
+</head>
+<body>
+  <header class="masthead">
+    <a class="brand" href="./">jungle king<span>.</span></a>
+    <div class="header-right"><span class="preview-label" id="preview-label">DESIGN PROTOTYPE</span><div class="languages" role="group" aria-label="Language / 語言"><button id="language-en" aria-pressed="true">EN</button><span aria-hidden="true">/</span><button id="language-zh" lang="zh-Hant" aria-pressed="false">繁中</button></div></div>
+  </header>
+  <main>
+    <nav class="back-row"><a href="./" id="back-link">← Back to scanner</a><span id="sample-note">Sample result · no camera recognition</span></nav>
+    <p id="loading" role="status">Loading animal story…</p>
+    <article id="story" hidden aria-labelledby="animal-name">
+      <section class="hero">
+        <div class="hero-copy"><p class="eyebrow" id="story-label">THE STORY BEHIND YOUR PIECE</p><h1 id="animal-name"></h1><p id="scientific-name" class="scientific"></p><p id="animal-intro" class="intro"></p><p id="mapping-note" class="mapping-note" hidden></p></div>
+        <figure><div class="artwork" id="artwork"></div><figcaption id="art-caption">Jungle King · game piece artwork</figcaption></figure>
+      </section>
+      <section class="conservation" aria-labelledby="status-heading">
+        <div><p class="eyebrow" id="status-heading">CONSERVATION STATUS</p><p class="status"><span class="status-dot" aria-hidden="true"></span><span id="status-value"></span></p><p id="status-scope" class="scope"></p></div>
+        <div class="status-context"><p id="status-note"></p><p id="secondary-status" class="secondary"></p></div>
+      </section>
+      <section class="details-grid" aria-label="Animal story details">
+        <div><p class="eyebrow"><span class="section-number">01 /</span><span id="habitat-label">WHERE IT LIVES</span></p><h2 id="habitat-title">A place to call home.</h2><p id="habitat"></p></div>
+        <div><p class="eyebrow"><span class="section-number">02 /</span><span id="threats-label">WHAT IT FACES</span></p><h2 id="threats-title">A changing world.</h2><p id="threats"></p></div>
+        <div><p class="eyebrow"><span class="section-number">03 /</span><span id="protection-label">WHAT HELPS</span></p><h2 id="protection-title">Room for a future.</h2><p id="protection"></p></div>
+      </section>
+      <section class="closer-look"><p class="eyebrow" id="fact-label">A CLOSER LOOK</p><p id="animal-fact"></p></section>
+      <div class="story-bottom"><details><summary id="sources-label">Sources & research notes</summary><ul id="sources"></ul><p id="research-note"></p><p id="credit"></p></details><a class="scan-button" href="./" id="scan-another">Scan another piece <span aria-hidden="true">↗</span></a></div>
+    </article>
+    <aside class="preview-tools" aria-label="Prototype examples"><label for="sample-piece" id="sample-label">Preview another animal</label><select id="sample-piece" disabled></select><span id="preview-help">Design preview only. Live recognition is being prepared.</span></aside>
+  </main>
+  <footer><a href="https://www.llab.co/" target="_blank" rel="noopener">llab design ltd ↗</a><span id="footer-note">Small pieces. Big stories.</span></footer>
+</body>
+</html>
