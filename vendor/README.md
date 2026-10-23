@@ -6,3 +6,5 @@ These unmodified release files ship with the static site so QR tests and 3D view
 - Google model-viewer 4.1.0: https://github.com/google/model-viewer (Apache 2.0). The bundle preserves embedded license notices and includes Three.js (MIT), Lit (BSD 3-Clause), and gainmap-js (MIT).
 
 License texts are included alongside the bundles. Rebuild with `npm ci` and `npm run build:test-assets`; versions are pinned in package-lock.json. Recognition libraries still load from the documented Teachable Machine CDN when connecting a trained model. Native AR services may need a network connection.
+
+JSZip 3.10.1 (`jszip.min.js`, MIT license in `JSZIP-LICENSE`) is used by the one-piece demo to save/open a model ZIP locally. It does not upload photos or model files.
