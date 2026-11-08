@@ -74,6 +74,99 @@ export const traditionalChinese = {
   },
 };
 
+Object.assign(traditionalChinese, {
+  "pangolin_piece": {
+    "name": "樹穿山甲",
+    "scientificName": "Phataginus tricuspis",
+    "intro": "善於攀樹的小型森林哺乳動物。樹穿山甲也稱為白腹穿山甲。",
+    "habitat": "西非和中非的森林，會在樹上活動，也在地面覓食。",
+    "threats": "為取得肉及鱗片而遭捕獵、非法野生動物貿易，以及森林棲地流失。",
+    "protection": "保護森林、減少非法貿易，並支持當地的監測與保育工作。",
+    "fact": "能捲握的尾巴有助牠在攀爬時抓住樹枝。",
+    "conservation": {
+      "category": "瀕危",
+      "scope": "全球物種 · 連結保育來源",
+      "secondary": [],
+      "note": "此故事採用「Tree Pangolin」所對應的白腹穿山甲身分。"
+    }
+  },
+  "lynx_piece": {
+    "name": "伊比利亞猞猁",
+    "scientificName": "Lynx pardinus",
+    "intro": "保育復育仍在進行。伊比利亞猞猁已重返更多地方，但牠的未來仍需要持續保護。",
+    "habitat": "西班牙及葡萄牙的地中海灌叢與林地交錯地景。",
+    "threats": "兔類獵物減少、棲地破碎化、路殺及非法殺害。",
+    "protection": "恢復兔類族群和棲地、維護安全的生態連結，並持續監測和復育。",
+    "fact": "歐洲野兔是牠的主要獵物，兔類疾病因此也會威脅猞猁復育。",
+    "conservation": {
+      "category": "易危",
+      "scope": "全球物種 · 連結保育來源",
+      "secondary": [],
+      "note": "2024 年評估為易危。族群復甦不代表保育工作可以停止。"
+    }
+  },
+  "eagle_piece": {
+    "name": "菲律賓鷹",
+    "scientificName": "Pithecophaga jefferyi",
+    "intro": "僅分布於菲律賓的森林守護者。保護牠，也是在保護牠周邊的森林社區。",
+    "habitat": "菲律賓的森林。",
+    "threats": "森林流失與狩獵，使能安全生活及繁殖的地方減少。",
+    "protection": "保護築巢森林、支持巡護人員與在地社區，並持續救傷和保育繁殖計畫。",
+    "fact": "菲律賓鷹是菲律賓的國鳥。",
+    "conservation": {
+      "category": "極危",
+      "scope": "全球物種 · 連結保育來源",
+      "secondary": [],
+      "note": "此保育等級適用於菲律賓鷹物種。"
+    }
+  },
+  "turtle_piece": {
+    "name": "綠海龜",
+    "scientificName": "Chelonia mydas",
+    "intro": "漫長的海洋旅程連繫覓食地與產卵沙灘。全球復甦令人鼓舞，但地方族群仍需要照顧。",
+    "habitat": "熱帶與亞熱帶海域，包括沿岸覓食地及產卵沙灘。",
+    "threats": "漁具混獲、產卵棲地流失、直接捕捉、污染與氣候變遷。",
+    "protection": "減少漁業混獲、保護產卵沙灘與沿岸棲地，並支持監測及負責任的海岸利用。",
+    "fact": "成年綠海龜主要以海草及藻類為食。",
+    "conservation": {
+      "category": "無危",
+      "scope": "全球物種 · 連結保育來源",
+      "secondary": [],
+      "note": "全球 IUCN 等級於 2025 年更新。地方族群仍可能受威脅；美國法律名錄採用獨立的族群評估。"
+    }
+  },
+  "zebra_piece": {
+    "name": "細紋斑馬",
+    "scientificName": "Equus grevyi",
+    "intro": "細密條紋與大耳朵是這種瀕危斑馬的特色。安全共享草地與水源，對牠的未來十分重要。",
+    "habitat": "肯亞及衣索比亞的乾燥草原與稀樹草原。",
+    "threats": "棲地流失、草地與水源競爭、乾旱、狩獵及疾病。",
+    "protection": "支持社區保育、保護水源及覓食地的通道，並持續監測族群。",
+    "fact": "每隻斑馬都有獨特的條紋圖案。",
+    "conservation": {
+      "category": "瀕危",
+      "scope": "全球物種 · 連結保育來源",
+      "secondary": [],
+      "note": "此等級描述細紋斑馬，並非所有斑馬物種。"
+    }
+  },
+  "whale_piece": {
+    "name": "藍鯨",
+    "scientificName": "Balaenoptera musculus",
+    "intro": "地球上最大的動物以微小獵物為食。藍鯨正從歷史捕鯨的影響中恢復，人類活動仍帶來風險。",
+    "habitat": "世界各大洋，在覓食與繁殖海域之間移動。",
+    "threats": "船隻撞擊及漁具纏繞，另有海洋噪音及棲地變化等風險。",
+    "protection": "減少船撞及漁具纏繞、保護重要棲地，並監測鯨類族群。",
+    "fact": "藍鯨利用鯨鬚板過濾稱為磷蝦的小型甲殼動物。",
+    "conservation": {
+      "category": "瀕危",
+      "scope": "美國《瀕危物種法》· 物種名錄",
+      "secondary": [],
+      "note": "此處顯示 NOAA 所報告的美國法律名錄等級，並非宣稱新近核實的全球 IUCN 評估。"
+    }
+  }
+});
+
 export function localizedProfile(profile, language) {
   const translation = language === 'zh-Hant' ? traditionalChinese[profile.pieceId] : null;
   return translation ? { ...profile, ...translation, conservation: { ...profile.conservation, ...translation.conservation } } : profile;
@@ -122,7 +215,7 @@ const siteEnglish = {
   noCamera: 'No camera was found on this device.', secureCamera: 'Open this page over HTTPS in a supported browser to use the camera.',
   cameraError: 'The camera could not start. Please try again.', scanUnavailable: 'Scanning is temporarily unavailable. Please try again later.',
   scanning: 'Hold one piece steady in the frame.', tryAgain: 'Try another angle. Keep one piece in the frame.',
-  matched: 'Animal found. Explore its story below.', confirming: 'Hold steady…', another: 'Ready for another piece.',
+  matched: 'Animal found. Scanning paused. Explore its story below.', confirming: 'Hold steady…', another: 'Ready for another piece.',
   scanError: 'Scanning stopped. Please try again.', contentError: 'Animal stories could not load. Please refresh the page.',
 };
 const siteChinese = {
@@ -137,7 +230,7 @@ const siteChinese = {
   noCamera: '此裝置未找到相機。', secureCamera: '請使用支援的瀏覽器透過 HTTPS 開啟此頁面，以使用相機。',
   cameraError: '無法啟動相機，請重試。', scanUnavailable: '掃描暫時無法使用，請稍後重試。',
   scanning: '請將一枚棋子保持在框內。', tryAgain: '請換個角度，並保持框內只有一枚棋子。',
-  matched: '已找到動物，請查看下方的故事。', confirming: '請保持穩定…', another: '可以掃描另一枚棋子。',
+  matched: '已找到動物，掃描已暫停。請查看下方的故事。', confirming: '請保持穩定…', another: '可以掃描另一枚棋子。',
   scanError: '掃描已停止，請重試。', contentError: '無法載入動物故事，請重新整理頁面。',
 };
 export function siteText(language, key) { return (language === 'zh-Hant' ? siteChinese : siteEnglish)[key]; }

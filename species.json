@@ -6,6 +6,7 @@
     {
       "pieceId": "elephant_piece",
       "labels": [
+        "Asian Elephant",
         "elephant_piece",
         "elephant",
         "asian_elephant"
@@ -62,6 +63,7 @@
     {
       "pieceId": "lion_piece",
       "labels": [
+        "West African Lion",
         "lion_piece",
         "lion",
         "west_african_lion"
@@ -123,6 +125,7 @@
     {
       "pieceId": "tiger_piece",
       "labels": [
+        "Malayan Tiger",
         "tiger_piece",
         "tiger",
         "malayan_tiger"
@@ -182,7 +185,7 @@
       "mappingStatus": "identified",
       "checkedOn": "2026-10-09",
       "assets": {
-        "glb": "./models/tiger-test.glb",
+        "glb": "models/tiger-test.glb",
         "usdz": null,
         "placeholder": true,
         "description": "Original stylised animated tiger test model; about 13 cm long. Not a product replica."
@@ -191,6 +194,7 @@
     {
       "pieceId": "leopard_piece",
       "labels": [
+        "Indochinese Leopard",
         "leopard_piece",
         "leopard",
         "indochinese_leopard"
@@ -252,6 +256,7 @@
     {
       "pieceId": "bear_piece",
       "labels": [
+        "Formosan Black Bear",
         "bear_piece",
         "bear",
         "formosan_black_bear"
@@ -314,6 +319,7 @@
     {
       "pieceId": "dog_piece",
       "labels": [
+        "African Wild Dog",
         "dog_piece",
         "dog",
         "african_wild_dog"
@@ -370,6 +376,7 @@
     {
       "pieceId": "cat_piece",
       "labels": [
+        "Leopard Cat",
         "cat_piece",
         "cat",
         "leopard_cat"
@@ -432,6 +439,7 @@
     {
       "pieceId": "rat_piece",
       "labels": [
+        "Aquatic Rat",
         "rat_piece",
         "rat",
         "aquatic_rat",
@@ -496,6 +504,333 @@
         "glb": null,
         "usdz": null
       }
+    },
+    {
+      "pieceId": "pangolin_piece",
+      "labels": [
+        "Tree Pangolin",
+        "pangolin_piece",
+        "tree_pangolin",
+        "pangolin"
+      ],
+      "name": "Tree Pangolin",
+      "scientificName": "Phataginus tricuspis",
+      "illustration": "pangolin",
+      "artwork": {
+        "file": "assets/illustrations/pangolin_piece.svg",
+        "width": 480,
+        "height": 400,
+        "crop": [
+          0,
+          0,
+          480,
+          400
+        ]
+      },
+      "intro": "A small forest mammal with a remarkable climbing tail. The tree pangolin is also known as the white-bellied pangolin.",
+      "habitat": "Forests of western and central Africa, where it climbs trees and also forages on the ground.",
+      "threats": "Hunting for meat and scales, illegal wildlife trade, and loss of forest habitat.",
+      "protection": "Protect forests, reduce illegal trade, and support local monitoring and conservation work.",
+      "fact": "Its prehensile tail helps it grip branches while climbing.",
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "scope": "Global species · linked conservation source",
+        "secondary": [],
+        "note": "This story uses the white-bellied pangolin identity associated with the name Tree Pangolin.",
+        "assessmentDate": null,
+        "sourceUrl": "https://pangolinsg.org/portfolio/white-bellied-pangolin/"
+      },
+      "sources": [
+        {
+          "name": "IUCN SSC Pangolin Specialist Group · White-bellied pangolin",
+          "url": "https://pangolinsg.org/portfolio/white-bellied-pangolin/",
+          "supports": "Species identity, ecology, conservation context and protection"
+        },
+        {
+          "name": "African Pangolin Working Group · White-bellied pangolin",
+          "url": "https://africanpangolin.org/about-us/the-four-african-pangolin-species/white-bellied-pangolin/",
+          "supports": "Species identity, ecology, conservation context and protection"
+        }
+      ],
+      "reviewed": true,
+      "mappingStatus": "identified",
+      "checkedOn": "2026-11-08",
+      "assets": {
+        "glb": null,
+        "usdz": null
+      },
+      "artworkKind": "illustration"
+    },
+    {
+      "pieceId": "lynx_piece",
+      "labels": [
+        "Iberian Lynx",
+        "lynx_piece",
+        "iberian_lynx",
+        "lynx"
+      ],
+      "name": "Iberian Lynx",
+      "scientificName": "Lynx pardinus",
+      "illustration": "lynx",
+      "artwork": {
+        "file": "assets/illustrations/lynx_piece.svg",
+        "width": 480,
+        "height": 400,
+        "crop": [
+          0,
+          0,
+          480,
+          400
+        ]
+      },
+      "intro": "A conservation recovery still in progress. The Iberian lynx has returned to more places, but its future depends on continued protection.",
+      "habitat": "Mediterranean scrub and woodland mosaics in Spain and Portugal.",
+      "threats": "Loss of rabbit prey, fragmented habitat, road collisions, and illegal killing.",
+      "protection": "Restore rabbit populations and habitat, maintain safe connections, and continue monitoring and recovery programmes.",
+      "fact": "European rabbits are its main prey; rabbit disease can therefore threaten lynx recovery.",
+      "conservation": {
+        "category": "Vulnerable",
+        "code": "VU",
+        "scope": "Global species · linked conservation source",
+        "secondary": [],
+        "note": "Assessed as Vulnerable in 2024. Recovery does not mean conservation work can stop.",
+        "assessmentDate": null,
+        "sourceUrl": "https://www.catsg.org/living-species-iberianlynx"
+      },
+      "sources": [
+        {
+          "name": "IUCN SSC Cat Specialist Group · Iberian lynx",
+          "url": "https://www.catsg.org/living-species-iberianlynx",
+          "supports": "Species identity, ecology, conservation context and protection"
+        }
+      ],
+      "reviewed": true,
+      "mappingStatus": "identified",
+      "checkedOn": "2026-11-08",
+      "assets": {
+        "glb": null,
+        "usdz": null
+      },
+      "artworkKind": "illustration"
+    },
+    {
+      "pieceId": "eagle_piece",
+      "labels": [
+        "Philippine Eagle",
+        "eagle_piece",
+        "philippine_eagle",
+        "eagle"
+      ],
+      "name": "Philippine Eagle",
+      "scientificName": "Pithecophaga jefferyi",
+      "illustration": "eagle",
+      "artwork": {
+        "file": "assets/illustrations/eagle_piece.svg",
+        "width": 480,
+        "height": 400,
+        "crop": [
+          0,
+          0,
+          480,
+          400
+        ]
+      },
+      "intro": "A forest guardian found only in the Philippines. Protecting this eagle also protects the forest communities around it.",
+      "habitat": "Forests in the Philippines.",
+      "threats": "Forest loss and hunting reduce the safe places where eagles can live and breed.",
+      "protection": "Protect nesting forests, support forest guards and local communities, and maintain rescue and conservation breeding programmes.",
+      "fact": "The Philippine eagle is the national bird of the Philippines.",
+      "conservation": {
+        "category": "Critically Endangered",
+        "code": "CR",
+        "scope": "Global species · linked conservation source",
+        "secondary": [],
+        "note": "The conservation category applies to the Philippine eagle species.",
+        "assessmentDate": null,
+        "sourceUrl": "https://www.philippineeaglefoundation.org/philippine-eagle"
+      },
+      "sources": [
+        {
+          "name": "Philippine Eagle Foundation · The Philippine eagle",
+          "url": "https://www.philippineeaglefoundation.org/philippine-eagle",
+          "supports": "Species identity, ecology, conservation context and protection"
+        }
+      ],
+      "reviewed": true,
+      "mappingStatus": "identified",
+      "checkedOn": "2026-11-08",
+      "assets": {
+        "glb": null,
+        "usdz": null
+      },
+      "artworkKind": "illustration"
+    },
+    {
+      "pieceId": "turtle_piece",
+      "labels": [
+        "Green Sea Turtle",
+        "turtle_piece",
+        "green_sea_turtle",
+        "turtle"
+      ],
+      "name": "Green Sea Turtle",
+      "scientificName": "Chelonia mydas",
+      "illustration": "turtle",
+      "artwork": {
+        "file": "assets/illustrations/turtle_piece.svg",
+        "width": 480,
+        "height": 400,
+        "crop": [
+          0,
+          0,
+          480,
+          400
+        ]
+      },
+      "intro": "A long ocean journey connects feeding grounds with nesting beaches. Global recovery is encouraging, while local turtle populations still need care.",
+      "habitat": "Tropical and subtropical seas, including coastal feeding grounds and sandy nesting beaches.",
+      "threats": "Accidental capture in fishing gear, loss of nesting habitat, direct take, pollution, and climate change.",
+      "protection": "Reduce fishing bycatch, protect nesting beaches and coastal habitat, and support monitoring and responsible coastal use.",
+      "fact": "Adult green turtles feed mainly on seagrasses and algae.",
+      "conservation": {
+        "category": "Least Concern",
+        "code": "LC",
+        "scope": "Global species · linked conservation source",
+        "secondary": [],
+        "note": "Global IUCN category updated in 2025. Regional populations can remain threatened; US legal listings use separate population assessments.",
+        "assessmentDate": null,
+        "sourceUrl": "https://www.afcd.gov.hk/english/conservation/con_fau/con_fau_sea/con_fau_sea_bas/con_fau_sea_bas_spe.html"
+      },
+      "sources": [
+        {
+          "name": "Hong Kong AFCD · Sea turtle species and IUCN categories",
+          "url": "https://www.afcd.gov.hk/english/conservation/con_fau/con_fau_sea/con_fau_sea_bas/con_fau_sea_bas_spe.html",
+          "supports": "Species identity, ecology, conservation context and protection"
+        },
+        {
+          "name": "NOAA Fisheries · Green turtle",
+          "url": "https://www.fisheries.noaa.gov/species/green-turtle",
+          "supports": "Species identity, ecology, conservation context and protection"
+        }
+      ],
+      "reviewed": true,
+      "mappingStatus": "identified",
+      "checkedOn": "2026-11-08",
+      "assets": {
+        "glb": null,
+        "usdz": null
+      },
+      "artworkKind": "illustration"
+    },
+    {
+      "pieceId": "zebra_piece",
+      "labels": [
+        "Grévy's Zebra",
+        "zebra_piece",
+        "grevys_zebra",
+        "zebra"
+      ],
+      "name": "Grévy's Zebra",
+      "scientificName": "Equus grevyi",
+      "illustration": "zebra",
+      "artwork": {
+        "file": "assets/illustrations/zebra_piece.svg",
+        "width": 480,
+        "height": 400,
+        "crop": [
+          0,
+          0,
+          480,
+          400
+        ]
+      },
+      "intro": "Fine stripes and large ears distinguish this endangered zebra. Sharing grasslands and water safely is central to its future.",
+      "habitat": "Dry grasslands and savannas in Kenya and Ethiopia.",
+      "threats": "Habitat loss, competition for grazing and water, drought, hunting, and disease.",
+      "protection": "Support community conservation, protect access to water and grazing, and monitor populations.",
+      "fact": "Each zebra has its own distinctive stripe pattern.",
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "scope": "Global species · linked conservation source",
+        "secondary": [],
+        "note": "The category describes Grevy’s zebra, rather than all zebra species.",
+        "assessmentDate": null,
+        "sourceUrl": "https://www.grevyszebratrust.org/conservation-status/"
+      },
+      "sources": [
+        {
+          "name": "Grevy’s Zebra Trust · Conservation status",
+          "url": "https://www.grevyszebratrust.org/conservation-status/",
+          "supports": "Species identity, ecology, conservation context and protection"
+        },
+        {
+          "name": "African Wildlife Foundation · Grevy’s zebra",
+          "url": "https://www.awf.org/wildlife-conservation/grevys-zebra",
+          "supports": "Species identity, ecology, conservation context and protection"
+        }
+      ],
+      "reviewed": true,
+      "mappingStatus": "identified",
+      "checkedOn": "2026-11-08",
+      "assets": {
+        "glb": null,
+        "usdz": null
+      },
+      "artworkKind": "illustration"
+    },
+    {
+      "pieceId": "whale_piece",
+      "labels": [
+        "Blue Whale",
+        "whale_piece",
+        "blue_whale",
+        "whale"
+      ],
+      "name": "Blue Whale",
+      "scientificName": "Balaenoptera musculus",
+      "illustration": "whale",
+      "artwork": {
+        "file": "assets/illustrations/whale_piece.svg",
+        "width": 480,
+        "height": 400,
+        "crop": [
+          0,
+          0,
+          480,
+          400
+        ]
+      },
+      "intro": "The largest animal on Earth feeds on tiny prey. Blue whales are recovering from historic whaling, but human activity still brings risks.",
+      "habitat": "Oceans worldwide, moving between feeding and breeding areas.",
+      "threats": "Vessel strikes and entanglement in fishing gear, with additional risks from ocean noise and changing habitat.",
+      "protection": "Reduce vessel collisions and entanglement, protect important habitat, and monitor whale populations.",
+      "fact": "Blue whales filter small crustaceans called krill through baleen plates.",
+      "conservation": {
+        "category": "Endangered",
+        "code": "EN",
+        "scope": "US Endangered Species Act · species listing",
+        "secondary": [],
+        "note": "The category shown is the US Endangered Species Act listing reported by NOAA; it is not presented as a newly verified global IUCN assessment.",
+        "assessmentDate": null,
+        "sourceUrl": "https://www.fisheries.noaa.gov/species/blue-whale"
+      },
+      "sources": [
+        {
+          "name": "NOAA Fisheries · Blue whale",
+          "url": "https://www.fisheries.noaa.gov/species/blue-whale",
+          "supports": "Species identity, ecology, conservation context and protection"
+        }
+      ],
+      "reviewed": true,
+      "mappingStatus": "identified",
+      "checkedOn": "2026-11-08",
+      "assets": {
+        "glb": null,
+        "usdz": null
+      },
+      "artworkKind": "illustration"
     }
   ]
 }

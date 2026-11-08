@@ -1,7 +1,8 @@
 import './components.js';
-import { validateProfiles, createLabelMap, choosePrediction, StableResult, conservationSummary, resolveQrPayload } from './pipeline.js';
-import { localizedProfile, cardText, cardLabelIds, siteText, siteLabelIds } from './content.js';
-import { recognitionModelFolder } from './site-config.js';
+import { validateProfiles, createLabelMap, StableResult, conservationSummary, resolveQrPayload } from './pipeline.js?v=20261108';
+import { localizedProfile, cardText, cardLabelIds, siteText, siteLabelIds } from './content.js?v=20261108';
+import { recognitionModelFolder } from './site-config.js?v=20261108';
+import { modelPieces, recognize } from './recognition.js?v=20261108';
 
 const $ = id => document.getElementById(id);
 const prototypePage = document.body.dataset.page === 'prototype';
@@ -10,6 +11,8 @@ let mode = prototypePage ? 'qr' : 'trained', running = false, runVersion = 0, ca
 let qrReader = null;
 let publicStatusKey = '', publicStatusError = false;
 let language = 'en', resultOrigin = null, resultScore = null;
+let supportedIds = [];
+let predictionTask = Promise.resolve();
 try { if (localStorage.getItem('jungle-king-card-language') === 'zh-Hant') language = 'zh-Hant'; } catch {}
 const text = key => cardText(language, key);
 const qrFrame = document.createElement('canvas');
@@ -81,7 +84,7 @@ function fillArtwork(element, profile, lazy = false) {
   const [x, y, width, height] = art.crop;
   element.style.aspectRatio = `${width} / ${height}`;
   const img = document.createElement('img');
-  img.src = art.file; img.alt = `${profile.name} game piece, from the supplied campaign screenshot`;
+  img.src = art.file; img.alt = profile.artworkKind === 'illustration' ? `${profile.name} animal illustration` : `${profile.name} game piece, from the supplied campaign screenshot`;
   img.width = art.width; img.height = art.height;
   img.loading = lazy ? 'lazy' : 'eager';
   img.style.width = `${art.width / width * 100}%`;
@@ -189,6 +192,7 @@ function renderCard(original, origin, score) {
   $('conservation-note').textContent = profile.conservation.note || '';
   $('protection').textContent = profile.protection || 'Conservation information pending.';
   $('animal-fact').textContent = profile.fact || 'Additional information pending.';
+  if (profile.artworkKind === 'illustration') $('art-credit-text').textContent = language === 'zh-Hant' ? '原創動物插畫 · 並非棋子產品圖像。' : 'Original animal illustration · not a product replica.';
   addSources($('source-list'), profile);
   $('source').textContent = language === 'zh-Hant' ? `來源查核日期：${profile.checkedOn}。${profile.conservation.assessmentDate ? `評估日期：${profile.conservation.assessmentDate}。` : '連結摘要中的主要評估日期尚未核實；不會以查核日期代替。'}` : researchDate(profile);
   $('result-origin').textContent = language === 'zh-Hant'
@@ -226,6 +230,7 @@ function setLanguage(value) {
     document.documentElement.lang = value;
     for (const id of siteLabelIds) $(id).textContent = siteText(value, id);
     $('camera').setAttribute('aria-label', siteText(value, 'cameraLabel'));
+    if ($('model-coverage') && supportedIds.length) $('model-coverage').textContent = `${value === 'zh-Hant' ? '目前支援：' : 'Currently recognises: '}${supportedIds.map(id => localizedProfile(profiles.find(p => p.pieceId === id), value).name).join(', ')}. ${value === 'zh-Hant' ? '其他動物尚未訓練。' : 'Other animals are not trained yet.'}`;
     publicStatus(publicStatusKey, publicStatusError);
     if (stream) updateCameraTag();
   }
@@ -329,7 +334,7 @@ async function runQrScan() {
             if (matchMedia('(max-width: 700px)').matches) $('profile-card').scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth', block: 'start' });
             return;
           }
-          status('This QR code is not a Jungle King test card. Use one of the eight supplied cards.');
+          status('This QR code is not a Jungle King test card. Use one of the supplied cards.');
         } catch (error) {
           if (!['NotFoundException', 'ChecksumException', 'FormatException'].includes(error.getKind?.() || error.name)) {
             stopRecognition(false); hideProfile(); status(`QR scanning stopped: ${error.message || 'Could not decode the camera frame.'}. Try again.`, true);
@@ -355,12 +360,16 @@ async function connectModel(loader) {
     await recognitionLibraries();
     const candidate = await loader();
     const labels = candidate.getClassLabels();
-    if (!labels.some(label => labelMap.has(label.trim().toLowerCase()))) {
+    let ids;
+    try { ids = modelPieces(labels, labelMap); } catch (error) {
       candidate.model?.dispose?.();
-      throw new Error('No model labels match species.json. Match the eight piece IDs or update the profile labels.');
+      throw error;
     }
+    await predictionTask.catch(() => {});
     previous?.model?.dispose?.();
     model = candidate;
+    supportedIds = ids;
+    if (!prototypePage) setLanguage(language);
     connectionStatus(`Model connected · labels: ${labels.join(', ')}. Unmapped labels are treated as unrecognised.`);
     $('recognition-state').textContent = 'Trained model connected';
     if (!prototypePage) publicStatus(stream ? 'ready' : 'scanReady');
@@ -387,9 +396,10 @@ async function runRecognition() {
         const scale = Math.max(bounds.width / video.videoWidth, bounds.height / video.videoHeight);
         const crop = bounds.width * 0.7 / scale;
         context.drawImage(video, (video.videoWidth - crop) / 2, (video.videoHeight - crop) / 2, crop, crop, 0, 0, 224, 224);
-        const predictions = await model.predict(frame);
+        predictionTask = model.predict(frame);
+        const predictions = await predictionTask;
         if (!running || version !== runVersion) return;
-        const candidate = choosePrediction(predictions, labelMap);
+        const candidate = recognize(predictions, labelMap);
         const stable = stability.update(candidate);
         if (!candidate) {
           hideProfile();
@@ -398,7 +408,11 @@ async function runRecognition() {
           if (!prototypePage) publicStatus('tryAgain'); else status('Piece not recognised confidently. Centre one piece and try another angle.');
         } else if (stable) {
           if (selected?.pieceId !== stable.pieceId) showProfile(stable.pieceId, 'model', stable.score);
-          if (!prototypePage) publicStatus('matched'); else status(`${profiles.find(p => p.pieceId === stable.pieceId).name} recognised · ${(stable.score * 100).toFixed(0)}% model score. Recognition is still running.`);
+          stopRecognition(false);
+          if (!prototypePage) publicStatus('matched'); else status(`${selected.name} recognised · ${(stable.score * 100).toFixed(0)}% model score. Scanning paused.`);
+          $('animal-name').focus({ preventScroll: true });
+          if (matchMedia('(max-width: 700px)').matches) $('profile-card').scrollIntoView({ block: 'start' });
+          return;
         } else {
           if (selected?.pieceId !== candidate.pieceId) hideProfile();
           if (!prototypePage) publicStatus('confirming'); else status(`Confirming result · ${stability.count}/4 consecutive frames.`);
@@ -496,7 +510,7 @@ document.addEventListener('visibilitychange', () => {
 window.addEventListener('pagehide', () => stopCamera(false));
 
 try {
-  const response = await fetch('./species.json');
+  const response = await fetch('./species.json?v=20261108');
   if (!response.ok) throw new Error(`Profile file returned HTTP ${response.status}.`);
   profiles = validateProfiles(await response.json()); labelMap = createLabelMap(profiles);
   profilesReady = true; updateButtons();

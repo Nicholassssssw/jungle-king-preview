@@ -1,4 +1,4 @@
-import { localizedProfile } from './content.js';
+import { localizedProfile } from './content.js?v=20261108';
 const $ = id => document.getElementById(id);
 const copy = {
   en: {
@@ -6,7 +6,7 @@ const copy = {
     'story-label':'THE STORY BEHIND YOUR PIECE', 'art-caption':'Jungle King · game piece artwork', 'status-heading':'CONSERVATION STATUS',
     'habitat-label':'WHERE IT LIVES', 'habitat-title':'A place to call home.', 'threats-label':'WHAT IT FACES', 'threats-title':'A changing world.',
     'protection-label':'WHAT HELPS', 'protection-title':'Room for a future.', 'fact-label':'A CLOSER LOOK', 'sources-label':'Sources & research notes',
-    'scan-another':'Scan another piece ↗', 'sample-label':'Preview another animal', 'preview-help':'Design preview only. Live recognition is being prepared.',
+    'scan-another':'Scan another piece ↗', 'sample-label':'Preview another animal', 'preview-help':'Design preview only. Use the scanner for live recognition.',
     'footer-note':'Small pieces. Big stories.', mapping:'Provisional identity: please confirm that the Aquatic Rat piece represents the European water vole.',
     credit:'Game artwork: llab design ltd, from the supplied campaign screenshots.',
   },
@@ -15,7 +15,7 @@ const copy = {
     'story-label':'棋子背後的故事', 'art-caption':'Jungle King · 棋子圖像', 'status-heading':'保育等級',
     'habitat-label':'棲息地', 'habitat-title':'牠的家園。', 'threats-label':'主要威脅', 'threats-title':'變動中的世界。',
     'protection-label':'保護方法', 'protection-title':'為未來留一片空間。', 'fact-label':'認識更多', 'sources-label':'資料來源與查核說明',
-    'scan-another':'掃描另一枚棋子 ↗', 'sample-label':'預覽其他動物', 'preview-help':'此頁僅供設計預覽，實際辨識功能正在準備中。',
+    'scan-another':'掃描另一枚棋子 ↗', 'sample-label':'預覽其他動物', 'preview-help':'此頁僅供設計預覽，請到掃描頁面使用即時辨識。',
     'footer-note':'小小棋子，大大故事。', mapping:'暫定身分：仍需確認水鼠棋子是否代表歐洲水田鼠。',
     credit:'遊戲圖像：llab design ltd，取自使用者提供的宣傳截圖。',
   },
@@ -41,6 +41,10 @@ function render(){
   img.src=p.artwork.file; img.alt=p.name; img.width=p.artwork.width; img.height=p.artwork.height;
   img.style.width=`${p.artwork.width/w*100}%`;img.style.left=`${-x/w*100}%`;img.style.top=`${-y/h*100}%`;
   art.replaceChildren(img);
+  if (p.artworkKind === 'illustration') {
+    $('art-caption').textContent=language==='en'?'Original animal illustration · not a product replica':'原創動物插畫 · 並非棋子產品圖像';
+    $('credit').textContent=$('art-caption').textContent;
+  }
   $('sources').replaceChildren(...p.sources.map(source=>{const li=document.createElement('li'),a=document.createElement('a');a.href=source.url;a.textContent=source.name;a.target='_blank';a.rel='noopener';li.append(a);return li;}));
   $('research-note').textContent=language==='en'?`Sources checked: ${p.checkedOn}. The source-check date is not the conservation assessment date. Primary assessment date has not been verified.`:`來源查核日期：${p.checkedOn}。查核日期並非保育評估日期；主要評估日期尚未核實。`;
   for(const option of $('sample-piece').options) option.textContent=localizedProfile(profiles.find(p=>p.pieceId===option.value),language).name;
@@ -49,7 +53,7 @@ function render(){
 for(const [id,value] of [['language-en','en'],['language-zh','zh-Hant']]) $(id).addEventListener('click',()=>{language=value;try{localStorage.setItem('jungle-king-card-language',value);}catch{}if(selected)render();});
 $('sample-piece').addEventListener('change',()=>{selected=profiles.find(p=>p.pieceId===$('sample-piece').value);render();const url=new URL(location.href);url.searchParams.set('piece',selected.pieceId);history.replaceState(null,'',url);});
 try {
-  const response=await fetch('./species.json'); if(!response.ok) throw new Error('Story unavailable');
+  const response=await fetch('./species.json?v=20261108'); if(!response.ok) throw new Error('Story unavailable');
   profiles=(await response.json()).profiles;
   const requested=new URL(location.href).searchParams.get('piece');
   selected=profiles.find(p=>p.pieceId===requested)||profiles.find(p=>p.pieceId==='tiger_piece');

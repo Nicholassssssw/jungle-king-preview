@@ -1,3 +1,4 @@
-// Set this to the exported Teachable Machine model folder when it is ready.
-// Example: './models/recognition/'. No training model is currently supplied.
-export const recognitionModelFolder = null;
+// Relative path supports both localhost and a GitHub Pages project subdirectory.
+export const recognitionModelFolder = './models/recognition/';
+// Hinson's conservative starting values. Calibrate with separate real-piece tests.
+export const recognitionOptions = Object.freeze({ threshold: 0.93, margin: 0.20 });

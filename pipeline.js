@@ -8,7 +8,7 @@ export function validateProfiles(data) {
     ids.add(profile.pieceId);
     for (const label of profile.labels) {
       const key = label.trim().toLowerCase();
-      if (!key || labels.has(key) || ['other', 'background', 'unknown'].includes(key)) throw new Error('Profile labels must be unique and must not use background labels.');
+      if (!key || labels.has(key) || ['other', 'background', 'unknown', 'none', 'empty'].includes(key)) throw new Error('Profile labels must be unique and must not use background labels.');
       labels.add(key);
     }
   }
@@ -38,7 +38,9 @@ export function choosePrediction(predictions, labelMap, threshold = 0.85, margin
   const ranked = predictions.filter(p => typeof p.className === 'string' && Number.isFinite(p.probability) && p.probability >= 0 && p.probability <= 1).sort((a, b) => b.probability - a.probability);
   const winner = ranked[0];
   if (!winner) return null;
-  const pieceId = labelMap.get(winner.className.trim().toLowerCase());
+  const label = winner.className.trim().toLowerCase();
+  if (['other', 'background', 'unknown', 'none', 'empty'].includes(label)) return null;
+  const pieceId = labelMap.get(label);
   if (!pieceId || winner.probability < threshold || winner.probability - (ranked[1]?.probability || 0) < margin) return null;
   return { pieceId, score: winner.probability };
 }

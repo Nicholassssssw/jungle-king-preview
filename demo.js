@@ -1,8 +1,11 @@
-import { encodeModelArchive, decodeModelArchive } from './demo-model.js';
-import { validateProfiles, createLabelMap, choosePrediction, StableResult } from './pipeline.js';
-import { localizedProfile } from './content.js';
+import { encodeModelArchive, decodeModelArchive } from './demo-model.js?v=20261108';
+import { validateProfiles, createLabelMap, StableResult } from './pipeline.js?v=20261108';
+import { recognitionModelFolder, recognitionOptions } from './site-config.js?v=20261108';
+import { modelPieces, recognize, summarizeTests, reportCsv } from './recognition.js?v=20261108';
+import { localizedProfile } from './content.js?v=20261108';
 const $ = id => document.getElementById(id);
 let profiles=[], labelMap, selected, model=null, stream=null, running=false, busy=false, cancelled=false, runVersion=0, cameraVersion=0;
+let testRows=[], modelInfo={};
 let photos=[[],[]], trainingHashes=new Set(), matched=null, language='en', predictionTask=Promise.resolve();
 try { if(localStorage.getItem('jungle-king-card-language')==='zh-Hant')language='zh-Hant'; } catch {}
 const stable=new StableResult(4), scripts=new Map();
@@ -15,6 +18,10 @@ function update(){
   $('train').disabled=busy||!selected||photos.some(files=>files.length<20||files.length>400);
   $('cancel-training').disabled=!busy||$('training-progress').hidden;
   $('save-model').disabled=busy||!model;
+  $('use-published-model').disabled=busy;
+  $('download-report').disabled=busy||!testRows.length;
+  $('clear-tests').disabled=busy;
+  $('threshold').disabled=$('margin').disabled=busy||running;
   $('test-model').disabled=busy||!model||!$('test-photos').files.length;
   $('camera-start').disabled=busy||!!stream||!selected;
   $('camera-stop').disabled=!stream;
@@ -26,7 +33,6 @@ function pause(){running=false;runVersion++;stable.reset();update();}
 function stopCamera(announce=true){cameraVersion++;pause();stream?.getTracks().forEach(t=>t.stop());stream=null;$('camera').srcObject=null;$('camera').hidden=true;$('camera-placeholder').hidden=false;hideResult();update();if(announce)message('scan-status',model?'Camera stopped. Enable it when you are ready.':'Train or open a model to enable scanning.');}
 // Training can fail before the library creates its trainingModel. Release each available model safely.
 function dispose(candidate){if(!candidate)return;for(const part of new Set([candidate.model,candidate.trainingModel,candidate.truncatedModel])){try{part?.dispose?.();}catch{}}}
-async function clearModel(){pause();await predictionTask.catch(()=>{});dispose(model);model=null;trainingHashes.clear();hideResult();message('model-status','No model connected. Scanning is disabled.');message('test-status','Connect or train a model first.');update();}
 function loadScript(url){if(scripts.has(url))return scripts.get(url);const promise=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src=url;script.onload=resolve;script.onerror=()=>{scripts.delete(url);script.remove();reject(new Error('A recognition library could not load. Check your internet connection and try again.'));};document.head.append(script);});scripts.set(url,promise);return promise;}
 async function libraries(){await loadScript('https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.3.1/dist/tf.min.js');await loadScript('https://cdn.jsdelivr.net/npm/@teachablemachine/image@0.8.3/dist/teachablemachine-image.min.js');if(!window.tmImage?.createTeachable)throw new Error('The training library is unavailable. Please refresh and retry.');}
 async function drawPhoto(file){
@@ -38,17 +44,20 @@ async function drawPhoto(file){
 async function digest(file){const bytes=await crypto.subtle.digest('SHA-256',await file.arrayBuffer());return [...new Uint8Array(bytes)].map(v=>v.toString(16).padStart(2,'0')).join('');}
 function download(blob,name){const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download=name;a.click();setTimeout(()=>URL.revokeObjectURL(url),30000);}
 async function acceptModel(candidate,hashes=new Set()){
-  const labels=candidate.getClassLabels().map(s=>s.trim().toLowerCase());
-  if(labels.length!==2||!labels.includes('other')||!labels.some(label=>labelMap.get(label)===selected.pieceId))throw new Error(`This demo needs two labels: ${selected.pieceId} (or its animal-name alias) and other. Choose the matching animal first.`);
-  await predictionTask.catch(()=>{});dispose(model);model=candidate;trainingHashes=hashes;
-  message('model-status',`Model ready · ${selected.name} and everything else. Download the model ZIP to keep it.`);
+  const ids=modelPieces(candidate.getClassLabels(),labelMap);
+  await predictionTask.catch(()=>{});dispose(model);model=candidate;trainingHashes=hashes;modelInfo=candidate.getMetadata?.()||{};
+  testRows=[];renderTestResults();
+  $('test-label').replaceChildren(...[...ids,'other'].map(id=>{const o=document.createElement('option');o.value=id;o.textContent=id==='other'?'Everything else / empty scene':profiles.find(p=>p.pieceId===id).name;return o;}));
+  const names=ids.map(id=>profiles.find(p=>p.pieceId===id).name).join(', ');
+  message('model-status',`Model ready · ${names}, plus other. Imported or newly trained models apply only in this tab; use the published model button to restore the website model.`);
+  $('supported-pieces').textContent=`Recognises: ${names}. Other animals are not trained in this model.`;
   message('scan-status','Model ready. Enable the camera, then start scanning.');message('test-status','Choose photos from a different session to check the model.');update();
 }
 for(const [id,index] of [['positive-photos',0],['negative-photos',1]]) $(id).addEventListener('change',async()=>{
-  photos[index]=[...$(id).files];await clearModel();message(index?'negative-count':'positive-count',`${photos[index].length} photos selected`,photos[index].length>400);
+  photos[index]=[...$(id).files];message(index?'negative-count':'positive-count',`${photos[index].length} photos selected`,photos[index].length>400);
   message('training-status',photos.some(f=>f.length<20)?'Add at least 20 photos to each group.':photos.some(f=>f.length>400)?'Use at most 400 photos in each group.':'Ready to train. More varied photos help; this minimum does not establish accuracy.');update();
 });
-$('piece').addEventListener('change',async()=>{stopCamera(false);await clearModel();selected=profiles.find(p=>p.pieceId===$('piece').value);photos=[[],[]];$('positive-photos').value='';$('negative-photos').value='';$('model-files').value='';$('test-photos').value='';$('positive-count').textContent=$('negative-count').textContent='No photos selected';$('positive-title').textContent=selected.name;message('training-status','Add photos to both groups to begin.');update();});
+$('piece').addEventListener('change',async()=>{selected=profiles.find(p=>p.pieceId===$('piece').value);photos=[[],[]];$('positive-photos').value='';$('negative-photos').value='';$('model-files').value='';$('test-photos').value='';$('positive-count').textContent=$('negative-count').textContent='No photos selected';$('positive-title').textContent=selected.name;message('training-status','Add photos to both groups to begin.');update();});
 $('train').addEventListener('click',async()=>{
   if(busy||photos.some(files=>files.length<20||files.length>400))return;
   busy=true;cancelled=false;pause();hideResult();$('training-progress').hidden=false;$('training-progress').value=0;update();let candidate;
@@ -72,11 +81,12 @@ $('cancel-training').addEventListener('click',()=>{cancelled=true;$('cancel-trai
 $('save-model').addEventListener('click',async()=>{
   if(!model||busy)return;busy=true;pause();update();
   try{
+    await predictionTask.catch(()=>{});
     if(!window.JSZip)throw new Error('The ZIP library did not load. Refresh after saving your original photos.');
     let saved;
     await model.model.save(window.tf.io.withSaveHandler(async artifacts=>{saved=artifacts;return {modelArtifactsInfo:{dateSaved:new Date(),modelTopologyType:'JSON',modelTopologyBytes:JSON.stringify(artifacts.modelTopology).length,weightSpecsBytes:JSON.stringify(artifacts.weightSpecs).length,weightDataBytes:artifacts.weightData.byteLength}};}));
     const bytes=await encodeModelArchive(window.JSZip,saved,model.getMetadata());
-    download(new Blob([bytes],{type:'application/zip'}),`jungle-king-${selected.pieceId}-model.zip`);message('model-status','Model ZIP downloaded. Keep this file; you can reopen it here after refreshing or on another device.');
+    download(new Blob([bytes],{type:'application/zip'}),`jungle-king-model.zip`);message('model-status','Model ZIP downloaded. Keep this file; you can reopen it here after refreshing or on another device.');
   }catch(error){message('model-status',`Could not save: ${error.message}`,true);}finally{busy=false;update();}
 });
 $('model-files').addEventListener('change',async()=>{
@@ -93,18 +103,37 @@ $('model-files').addEventListener('change',async()=>{
   }catch(error){dispose(candidate);message('model-status',`Could not open model: ${error.message}${model?' Previous model is still connected.':''}`,true);}finally{busy=false;update();}
 });
 $('test-photos').addEventListener('change',update);
+function options(){return {threshold:Number($('threshold').value),margin:Number($('margin').value)};}
+function renderTestResults(){
+  const summary=summarizeTests(testRows);
+  $('test-summary').textContent=testRows.length?`${summary.total} tested: ${summary.correct} correct animal matches, ${summary.missed} missed/uncertain, ${summary.wrong} wrong animals; ${summary.falseMatches} false matches in ${summary.background} other/empty photos. These are photo results, not live-camera accuracy.`:'No test results yet. Add separate-session photos for each trained animal and for empty scenes.';
+  $('test-results').replaceChildren(...testRows.map(row=>{const tr=document.createElement('tr');for(const value of [row.file,row.expected==='other'?'Other':profiles.find(p=>p.pieceId===row.expected).name,row.actual==='other'?'Rejected / uncertain':profiles.find(p=>p.pieceId===row.actual).name,`${(row.score*100).toFixed(1)}%`]){const td=document.createElement('td');td.textContent=value;tr.append(td);}return tr;}));
+}
+$('download-report').addEventListener('click',()=>download(new Blob([reportCsv(testRows)],{type:'text/csv;charset=utf-8'}),'jungle-king-recognition-tests.csv'));
+$('clear-tests').addEventListener('click',()=>{testRows=[];renderTestResults();update();});
+for(const id of ['threshold','margin'])$(id).addEventListener('change',()=>{pause();hideResult();message('test-status','Settings changed. Previous rows keep their original settings in the CSV; retest every class and empty scenes before using these settings.');});
 $('test-model').addEventListener('click',async()=>{
   if(busy||!model)return;const files=[...$('test-photos').files];if(!files.length||files.length>200){message('test-status','Choose between 1 and 200 separate test photos.',true);return;}busy=true;pause();update();
+  const batch=[];
   try{
-    let accepted=0,rejected=0;const expected=$('test-label').value==='piece';
+    await predictionTask.catch(()=>{});
+    const expected=$('test-label').value,settings=options();
     for(let i=0;i<files.length;i++){
       if(trainingHashes.has(await digest(files[i])))throw new Error(`${files[i].name} was used for training. Choose photos from a different session.`);
-      predictionTask=model.predict(await drawPhoto(files[i]));const match=choosePrediction(await predictionTask,labelMap);
-      if(match?.pieceId===selected.pieceId)accepted++;else rejected++;message('test-status',`Checking photo ${i+1} of ${files.length}…`);await window.tf.nextFrame();
+      predictionTask=model.predict(await drawPhoto(files[i]));const predictions=await predictionTask,match=recognize(predictions,labelMap,settings),top=[...predictions].sort((a,b)=>b.probability-a.probability)[0];
+      batch.push({file:files[i].name,expected,actual:match?.pieceId||'other',topLabel:top.className,score:top.probability,modelName:modelInfo.modelName||'Imported model',exportedAt:modelInfo.timeStamp||'Unknown',testedAt:new Date().toISOString(),...settings});
+      message('test-status',`Checking photo ${i+1} of ${files.length}…`);await window.tf.nextFrame();
     }
-    message('test-status',expected?`${files.length} piece photos: ${accepted} accepted, ${rejected} missed or uncertain. Repeat on a different session and device.`:`${files.length} other photos: ${rejected} rejected, ${accepted} false matches. Collect more varied examples if false matches occur.`);
+    testRows.push(...batch);renderTestResults();message('test-status',`Added ${batch.length} photos. Test every trained animal and other/empty scenes in several capture sessions; download the CSV to compare errors and settings.`);
   }catch(error){message('test-status',error.message,true);}finally{busy=false;update();}
 });
+async function loadPublishedModel(){
+  if(busy)return;busy=true;pause();hideResult();update();let candidate;
+  try{message('model-status','Loading the published recognition model…');await libraries();const folder=new URL(recognitionModelFolder,location.href);candidate=await window.tmImage.load(new URL('model.json',folder).href,new URL('metadata.json',folder).href);await acceptModel(candidate);candidate=null;message('page-status','Published model connected. Enable your camera below to start.');}
+  catch(error){dispose(candidate);message('model-status',`Could not load the published model: ${error.message}. Check your connection and retry.${model?' Previous model remains connected.':''}`,true);}
+  finally{busy=false;update();}
+}
+$('use-published-model').addEventListener('click',loadPublishedModel);
 $('camera-start').addEventListener('click',async()=>{
   if(stream||busy)return;const version=++cameraVersion;$('camera-start').disabled=true;message('scan-status','Requesting camera permission…');let next;
   try{
@@ -122,7 +151,7 @@ $('scan-start').addEventListener('click',()=>{
   const tick=async()=>{
     if(!running||version!==runVersion||!stream||document.hidden)return;
     try{
-      const video=$('camera');if(video.readyState>=2){const size=Math.min(video.videoWidth,video.videoHeight)*0.7;frameCtx.drawImage(video,(video.videoWidth-size)/2,(video.videoHeight-size)/2,size,size,0,0,224,224);predictionTask=model.predict(frame);const predictions=await predictionTask;if(!running||version!==runVersion)return;const match=stable.update(choosePrediction(predictions,labelMap));
+      const video=$('camera');if(video.readyState>=2){const size=Math.min(video.videoWidth,video.videoHeight)*0.7;frameCtx.drawImage(video,(video.videoWidth-size)/2,(video.videoHeight-size)/2,size,size,0,0,224,224);predictionTask=model.predict(frame);const predictions=await predictionTask;if(!running||version!==runVersion)return;const match=stable.update(recognize(predictions,labelMap,options()));
       if(match){pause();matched=match;renderResult();message('scan-status','Animal found. Scanning paused so you can explore its story.');$('animal-name').focus({preventScroll:true});if(matchMedia('(max-width:600px)').matches)$('demo-result').scrollIntoView({block:'start'});return;}
       message('scan-status',stable.count?`Confirming · ${stable.count} of 4 matching frames. Hold steady…`:'No clear match. Centre one piece or try another angle.');}
       if(running&&version===runVersion)setTimeout(tick,250);
@@ -142,6 +171,7 @@ function renderResult(){
   $('mapping-note').hidden=p.mappingStatus!=='provisional';$('mapping-note').textContent=zh?'仍需確認水鼠棋子是否代表歐洲水田鼠。':'Please confirm that the Aquatic Rat piece represents the European water vole.';
   const art=$('piece-art');art.replaceChildren();if(p.artwork){const [x,y,w,h]=p.artwork.crop;art.style.aspectRatio=`${w}/${h}`;const img=document.createElement('img');img.src=p.artwork.file;img.alt=p.name;img.style.width=`${p.artwork.width/w*100}%`;img.style.left=`${-x/w*100}%`;img.style.top=`${-y/h*100}%`;art.append(img);}
   $('source-list').replaceChildren(...p.sources.map(s=>{const li=document.createElement('li'),a=document.createElement('a');a.href=s.url;a.textContent=s.name;a.target='_blank';a.rel='noopener';li.append(a);return li;}));
+  $('art-credit').textContent=p.artworkKind==='illustration'?(zh?'原創動物插畫 · 並非棋子產品圖像':'Original animal illustration · not a product replica'):(zh?'遊戲圖像：llab design ltd':'Game artwork: llab design ltd');
   $('research-date').textContent=zh?`來源查核日期：${p.checkedOn}。主要評估日期尚未核實。`:`Sources checked: ${p.checkedOn}. Primary assessment date not verified.`;
   $('story-en').setAttribute('aria-pressed',String(!zh));$('story-zh').setAttribute('aria-pressed',String(zh));
 }
@@ -149,4 +179,4 @@ for(const [id,value] of [['story-en','en'],['story-zh','zh-Hant']])$(id).addEven
 document.addEventListener('visibilitychange',()=>{if(document.hidden)stopCamera();});
 window.addEventListener('pagehide',()=>stopCamera(false));
 window.addEventListener('beforeunload',event=>{if(busy){event.preventDefault();event.returnValue='';}});
-try{const response=await fetch('./species.json');if(!response.ok)throw new Error('Animal stories unavailable.');profiles=validateProfiles(await response.json());labelMap=createLabelMap(profiles);selected=profiles.find(p=>p.pieceId==='tiger_piece')||profiles[0];$('piece').replaceChildren(...profiles.map(p=>{const option=document.createElement('option');option.value=p.pieceId;option.textContent=p.name;return option;}));$('piece').value=selected.pieceId;$('positive-title').textContent=selected.name;message('page-status','Choose one piece below. Training and scanning start only when you ask.');update();}catch(error){message('page-status',error.message,true);}
+try{const response=await fetch('./species.json?v=20261108');if(!response.ok)throw new Error('Animal stories unavailable.');profiles=validateProfiles(await response.json());labelMap=createLabelMap(profiles);selected=profiles.find(p=>p.pieceId==='zebra_piece')||profiles[0];$('piece').replaceChildren(...profiles.map(p=>{const option=document.createElement('option');option.value=p.pieceId;option.textContent=p.name;return option;}));$('piece').value=selected.pieceId;$('positive-title').textContent=selected.name;message('page-status','Loading the published model. Camera access starts only when you ask.');$('threshold').value=recognitionOptions.threshold;$('margin').value=recognitionOptions.margin;update();if(recognitionModelFolder)await loadPublishedModel();}catch(error){message('page-status',error.message,true);}
