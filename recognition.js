@@ -1,5 +1,5 @@
 import { choosePrediction } from './pipeline.js?v=20261108';
-import { recognitionOptions } from './site-config.js?v=20261108';
+import { recognitionOptions } from './site-config.js?v=20261109-v3';
 
 export const backgroundLabels = new Set(['other', 'background', 'unknown', 'none', 'empty']);
 

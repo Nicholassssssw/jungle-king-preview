@@ -3,8 +3,8 @@ import './components.js?v=20261109';
 import { demoSelection, nextDemoAnimal } from './demo-state.js?v=20261109';
 import { validateProfiles, createLabelMap, StableResult, conservationSummary, resolveQrPayload } from './pipeline.js?v=20261108';
 import { localizedProfile, cardText, cardLabelIds, siteText, siteLabelIds } from './content.js?v=20261109';
-import { recognitionModelFolder } from './site-config.js?v=20261108';
-import { modelPieces, recognize } from './recognition.js?v=20261108';
+import { recognitionModelFolder } from './site-config.js?v=20261109-v3';
+import { modelPieces, recognize } from './recognition.js?v=20261109-v3';
 
 const $ = id => document.getElementById(id);
 const demoPage = document.body.dataset.mode === 'demo';
