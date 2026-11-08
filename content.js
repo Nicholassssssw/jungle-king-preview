@@ -207,7 +207,7 @@ const siteEnglish = {
   'scan-eyebrow': 'A CLOSER LOOK', 'scan-title': 'Scan a piece.', 'scan-description': 'Every piece has a story. Place one Jungle King piece in the frame to meet its animal.',
   'stage-caption': 'Centre one piece', 'start-camera': 'Enable camera', 'stop-camera': 'Stop camera',
   'scan-trained': 'Scan piece', 'stop-recognition': 'Pause scanning',
-  'preparation-note': 'Product scanning is being prepared.', 'prototype-link': 'Prototype ↗',
+  'preparation-note': 'Connecting the recognition model…', 'nav-scan': 'Scanner', 'nav-demo': 'Demo',
   cameraLabel: 'Live camera view', livePreview: 'Live camera', requesting: 'Requesting camera permission…',
   previewReady: 'Camera preview is ready.', ready: 'Camera ready. Centre a piece and start scanning.',
   scanReady: 'Ready to scan. Enable your camera to begin.', paused: 'Scanning paused.', stopped: 'Camera stopped.',
@@ -215,6 +215,7 @@ const siteEnglish = {
   noCamera: 'No camera was found on this device.', secureCamera: 'Open this page over HTTPS in a supported browser to use the camera.',
   cameraError: 'The camera could not start. Please try again.', scanUnavailable: 'Scanning is temporarily unavailable. Please try again later.',
   scanning: 'Hold one piece steady in the frame.', tryAgain: 'Try another angle. Keep one piece in the frame.',
+  demoReady: 'Preview the scan screen. Choose an animal to show its sample result.', demoMatched: 'Sample result · no camera recognition.',
   matched: 'Animal found. Scanning paused. Explore its story below.', confirming: 'Hold steady…', another: 'Ready for another piece.',
   scanError: 'Scanning stopped. Please try again.', contentError: 'Animal stories could not load. Please refresh the page.',
 };
@@ -222,7 +223,7 @@ const siteChinese = {
   'scan-eyebrow': '認識更多', 'scan-title': '掃描棋子。', 'scan-description': '每枚棋子都有一個故事。將一枚 Jungle King 棋子置於框內，認識牠所代表的動物。',
   'stage-caption': '將一枚棋子置於中央', 'start-camera': '啟用相機', 'stop-camera': '關閉相機',
   'scan-trained': '掃描棋子', 'stop-recognition': '暫停掃描',
-  'preparation-note': '棋子辨識功能正在準備中。', 'prototype-link': '原型頁面 ↗',
+  'preparation-note': '正在連接辨識模型…', 'nav-scan': '掃描', 'nav-demo': '示範',
   cameraLabel: '即時相機畫面', livePreview: '即時相機', requesting: '正在請求相機權限…',
   previewReady: '相機預覽已就緒。', ready: '相機已就緒。將棋子置於中央，然後開始掃描。',
   scanReady: '掃描已就緒。啟用相機即可開始。', paused: '掃描已暫停。', stopped: '相機已關閉。',
@@ -230,6 +231,7 @@ const siteChinese = {
   noCamera: '此裝置未找到相機。', secureCamera: '請使用支援的瀏覽器透過 HTTPS 開啟此頁面，以使用相機。',
   cameraError: '無法啟動相機，請重試。', scanUnavailable: '掃描暫時無法使用，請稍後重試。',
   scanning: '請將一枚棋子保持在框內。', tryAgain: '請換個角度，並保持框內只有一枚棋子。',
+  demoReady: '預覽掃描畫面，選擇動物即可顯示模擬結果。', demoMatched: '模擬結果 · 未使用相機辨識。',
   matched: '已找到動物，掃描已暫停。請查看下方的故事。', confirming: '請保持穩定…', another: '可以掃描另一枚棋子。',
   scanError: '掃描已停止，請重試。', contentError: '無法載入動物故事，請重新整理頁面。',
 };

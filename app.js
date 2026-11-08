@@ -1,17 +1,20 @@
-import './components.js';
+import './site-shell.js?v=20261109';
+import './components.js?v=20261109';
+import { demoSelection, nextDemoAnimal } from './demo-state.js?v=20261109';
 import { validateProfiles, createLabelMap, StableResult, conservationSummary, resolveQrPayload } from './pipeline.js?v=20261108';
-import { localizedProfile, cardText, cardLabelIds, siteText, siteLabelIds } from './content.js?v=20261108';
+import { localizedProfile, cardText, cardLabelIds, siteText, siteLabelIds } from './content.js?v=20261109';
 import { recognitionModelFolder } from './site-config.js?v=20261108';
 import { modelPieces, recognize } from './recognition.js?v=20261108';
 
 const $ = id => document.getElementById(id);
+const demoPage = document.body.dataset.mode === 'demo';
+let demoPieceId = null, demoView = 'result';
 const prototypePage = document.body.dataset.page === 'prototype';
 let profiles = [], labelMap = new Map(), selected = null, stream = null, model = null;
-let mode = prototypePage ? 'qr' : 'trained', running = false, runVersion = 0, cameraVersion = 0, assetVersion = 0, modelBusy = false, profilesReady = false;
+let mode = demoPage ? 'demo' : prototypePage ? 'qr' : 'trained', running = false, runVersion = 0, cameraVersion = 0, assetVersion = 0, modelBusy = false, profilesReady = false;
 let qrReader = null;
 let publicStatusKey = '', publicStatusError = false;
 let language = 'en', resultOrigin = null, resultScore = null;
-let supportedIds = [];
 let predictionTask = Promise.resolve();
 try { if (localStorage.getItem('jungle-king-card-language') === 'zh-Hant') language = 'zh-Hant'; } catch {}
 const text = key => cardText(language, key);
@@ -43,7 +46,7 @@ function updateButtons() {
   if ($('stop-qr')) $('stop-qr').disabled = !running || mode !== 'qr';
   $('stop-recognition').disabled = !running || mode !== 'trained';
   $('stop-camera').disabled = !stream;
-  $('start-camera').disabled = !!stream;
+  $('start-camera').disabled = demoPage || !!stream;
   if ($('load-model-url')) $('load-model-url').disabled = modelBusy;
   if ($('model-files')) $('model-files').disabled = modelBusy;
   if (!prototypePage) {
@@ -51,7 +54,7 @@ function updateButtons() {
     $('stop-camera').hidden = !stream;
     $('camera-tag').hidden = !stream;
     $('trained-controls').hidden = !model;
-    $('preparation-note').hidden = !!model;
+    $('preparation-note').hidden = demoPage || !!model;
   }
 }
 function loadScript(url, module = false) {
@@ -60,7 +63,7 @@ function loadScript(url, module = false) {
     const script = document.createElement('script');
     if (module) script.type = 'module';
     const retry = scriptRetries.get(url) || 0;
-    const source = new URL(url, location.href);
+    const source = new URL(url, document.baseURI);
     // Browsers remember failed ES-module fetches for the same URL until reload.
     if (module && retry) source.searchParams.set('retry', String(retry));
     script.src = source.href;
@@ -117,7 +120,7 @@ function secondaryStatus(profile) {
 function safeAsset(value) {
   if (!value) return null;
   try {
-    const url = new URL(value, location.href);
+    const url = new URL(value, document.baseURI);
     return ['http:', 'https:'].includes(url.protocol) ? url.href : null;
   } catch { return null; }
 }
@@ -221,6 +224,50 @@ function showProfile(pieceId, origin, score = null) {
   $('profile-illustration').classList.remove('moving');
   connect3D(profile);
 }
+
+const demoCopy = {
+  en: { label: 'DEMO / CHOOSE AN ANIMAL', title: 'Explore the experience.', note: 'Sample results. No camera or recognition required.', scan: 'Scan screen', result: 'Animal result', previous: '← Previous animal', next: 'Next animal →', animals: 'Choose an animal' },
+  'zh-Hant': { label: '示範 / 選擇動物', title: '探索掃描體驗。', note: '模擬結果，無需使用相機或辨識模型。', scan: '掃描畫面', result: '動物結果', previous: '← 上一種動物', next: '下一種動物 →', animals: '選擇動物' },
+};
+function renderDemoControls() {
+  const copy = demoCopy[language];
+  for (const [id, key] of Object.entries({ 'demo-label': 'label', 'demo-title': 'title', 'demo-note': 'note', 'demo-show-scanner': 'scan', 'demo-show-result': 'result', 'demo-previous': 'previous', 'demo-next': 'next' })) $(id).textContent = copy[key];
+  const group = $('demo-animals');
+  group.setAttribute('aria-label', copy.animals);
+  if (group.children.length !== profiles.length) {
+    group.replaceChildren(...profiles.map(profile => {
+      const button = document.createElement('button');
+      button.type = 'button'; button.className = 'animal-button'; button.dataset.piece = profile.pieceId;
+      button.addEventListener('click', () => { demoPieceId = profile.pieceId; showDemo('result'); });
+      return button;
+    }));
+  }
+  for (const button of group.children) {
+    button.textContent = localizedProfile(profiles.find(profile => profile.pieceId === button.dataset.piece), language).name;
+    button.setAttribute('aria-pressed', String(button.dataset.piece === demoPieceId));
+  }
+  $('demo-show-scanner').setAttribute('aria-pressed', String(demoView === 'scan'));
+  $('demo-show-result').setAttribute('aria-pressed', String(demoView === 'result'));
+  for (const id of ['demo-previous', 'demo-next', 'demo-show-scanner', 'demo-show-result']) $(id).disabled = !profilesReady;
+}
+function showDemo(view, writeHistory = true) {
+  if (!profilesReady) return;
+  demoView = view;
+  if (view === 'result') showProfile(demoPieceId, 'demo'); else hideProfile();
+  publicStatus(view === 'result' ? 'demoMatched' : 'demoReady');
+  renderDemoControls();
+  if (writeHistory) {
+    const url = new URL(location.href);
+    url.searchParams.set('piece', demoPieceId); url.searchParams.set('view', view);
+    history.pushState(null, '', url);
+  }
+}
+if (demoPage) {
+  $('demo-show-scanner').addEventListener('click', () => showDemo('scan'));
+  $('demo-show-result').addEventListener('click', () => showDemo('result'));
+  for (const [id, direction] of [['demo-previous', -1], ['demo-next', 1]]) $(id).addEventListener('click', () => { demoPieceId = nextDemoAnimal(profiles, demoPieceId, direction); showDemo('result'); });
+  window.addEventListener('popstate', () => { if (!profilesReady) return; const state = demoSelection(location.search, profiles); demoPieceId = state.pieceId; showDemo(state.view, false); });
+}
 function setLanguage(value) {
   language = value;
   try { localStorage.setItem('jungle-king-card-language', value); } catch {}
@@ -230,8 +277,8 @@ function setLanguage(value) {
     document.documentElement.lang = value;
     for (const id of siteLabelIds) $(id).textContent = siteText(value, id);
     $('camera').setAttribute('aria-label', siteText(value, 'cameraLabel'));
-    if ($('model-coverage') && supportedIds.length) $('model-coverage').textContent = `${value === 'zh-Hant' ? '目前支援：' : 'Currently recognises: '}${supportedIds.map(id => localizedProfile(profiles.find(p => p.pieceId === id), value).name).join(', ')}. ${value === 'zh-Hant' ? '其他動物尚未訓練。' : 'Other animals are not trained yet.'}`;
     publicStatus(publicStatusKey, publicStatusError);
+    if (demoPage) renderDemoControls();
     if (stream) updateCameraTag();
   }
   if (selected) {
@@ -360,15 +407,13 @@ async function connectModel(loader) {
     await recognitionLibraries();
     const candidate = await loader();
     const labels = candidate.getClassLabels();
-    let ids;
-    try { ids = modelPieces(labels, labelMap); } catch (error) {
+    try { modelPieces(labels, labelMap); } catch (error) {
       candidate.model?.dispose?.();
       throw error;
     }
     await predictionTask.catch(() => {});
     previous?.model?.dispose?.();
     model = candidate;
-    supportedIds = ids;
     if (!prototypePage) setLanguage(language);
     connectionStatus(`Model connected · labels: ${labels.join(', ')}. Unmapped labels are treated as unrecognised.`);
     $('recognition-state').textContent = 'Trained model connected';
@@ -429,6 +474,7 @@ async function runRecognition() {
 }
 
 $('scan-another').addEventListener('click', () => {
+  if (demoPage) { showDemo('scan'); $('demo-show-result').focus(); return; }
   stopRecognition(false); hideProfile();
   if (!prototypePage) publicStatus('another');
   else status(mode === 'demo' ? 'Ready for another demo scan.' : mode === 'qr' ? 'Ready for another QR card. Start QR scanning when it is in the square.' : 'Ready for another piece. Start recognition when it is in the square.');
@@ -459,7 +505,7 @@ $('load-model-url')?.addEventListener('click', () => {
   const raw = $('model-url').value.trim();
   if (!raw) { connectionStatus('Enter a model folder URL or select the exported files.', true); return; }
   try {
-    const url = new URL(raw, location.href);
+    const url = new URL(raw, document.baseURI);
     if (url.protocol !== 'https:' && !(url.protocol === 'http:' && (url.origin === location.origin || ['localhost', '127.0.0.1'].includes(url.hostname)))) throw new Error('Use an HTTPS model URL or a local project folder.');
     if (!url.pathname.endsWith('/')) url.pathname += '/';
     url.search = ''; url.hash = '';
@@ -504,13 +550,13 @@ $('model-viewer').addEventListener('ar-status', event => {
   if (event.detail.status === 'failed') $('model-status').textContent = 'AR could not start on this device. The on-page 3D viewer is still available.';
 });
 document.addEventListener('visibilitychange', () => {
-  if (document.hidden && running) stopRecognition();
+  if (document.hidden && stream) stopCamera(false);
   if (document.hidden) { $('model-viewer').pause?.(); $('animate').textContent = text('play'); }
 });
 window.addEventListener('pagehide', () => stopCamera(false));
 
 try {
-  const response = await fetch('./species.json?v=20261108');
+  const response = await fetch(new URL('species.json?v=20261108', document.baseURI));
   if (!response.ok) throw new Error(`Profile file returned HTTP ${response.status}.`);
   profiles = validateProfiles(await response.json()); labelMap = createLabelMap(profiles);
   profilesReady = true; updateButtons();
@@ -522,8 +568,12 @@ try {
       const option = document.createElement('option'); option.value = profile.pieceId; option.textContent = `${profile.name} piece`; $('demo-piece').append(option);
     }
     const other = document.createElement('option'); other.value = 'other'; other.textContent = 'Unrecognised object'; $('demo-piece').append(other);
+  } else if (demoPage) {
+    const initial = demoSelection(location.search, profiles);
+    demoPieceId = initial.pieceId;
+    renderDemoControls(); showDemo(initial.view, false);
   } else if (recognitionModelFolder) {
-    const folder = new URL(recognitionModelFolder, location.href);
+    const folder = new URL(recognitionModelFolder, document.baseURI);
     if (!folder.pathname.endsWith('/')) folder.pathname += '/';
     await connectModel(() => window.tmImage.load(new URL('model.json', folder).href, new URL('metadata.json', folder).href));
   }
