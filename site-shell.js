@@ -6,10 +6,10 @@ if (mount) {
   mount.outerHTML = `
     <header class="masthead">
       <a href="./" class="brand" aria-label="Jungle King home">jungle king<span aria-hidden="true">.</span></a>
-      <nav class="page-navigation" aria-label="Pages">
-        <a class="page-button" href="./" id="nav-scan" ${!demo ? 'aria-current="page"' : ''}>Scanner</a>
-        <a class="page-button" href="demo.html" id="nav-demo" ${demo ? 'aria-current="page"' : ''}>Demo</a>
-      </nav>
+      ${demo ? `<nav class="page-navigation" aria-label="Pages">
+        <a class="page-button" href="./" id="nav-scan">Scanner</a>
+        <a class="page-button" href="demo.html" id="nav-demo" aria-current="page">Demo</a>
+      </nav>` : ''}
       <div class="language-controls" role="group" aria-label="Language / 語言"><button class="text-button" id="language-en" aria-pressed="true">EN</button><span aria-hidden="true">/</span><button class="text-button" id="language-zh" aria-pressed="false" lang="zh-Hant">繁中</button></div>
     </header>
     <main>

@@ -1,4 +1,4 @@
-import './site-shell.js?v=20261109';
+import './site-shell.js?v=20261109-scanner';
 import './components.js?v=20261109';
 import { demoSelection, nextDemoAnimal } from './demo-state.js?v=20261109';
 import { validateProfiles, createLabelMap, StableResult, conservationSummary, resolveQrPayload } from './pipeline.js?v=20261108';
@@ -275,7 +275,10 @@ function setLanguage(value) {
   $('language-zh').setAttribute('aria-pressed', String(value === 'zh-Hant'));
   if (!prototypePage) {
     document.documentElement.lang = value;
-    for (const id of siteLabelIds) $(id).textContent = siteText(value, id);
+    for (const id of siteLabelIds) {
+      const label = $(id);
+      if (label) label.textContent = siteText(value, id);
+    }
     $('camera').setAttribute('aria-label', siteText(value, 'cameraLabel'));
     publicStatus(publicStatusKey, publicStatusError);
     if (demoPage) renderDemoControls();
